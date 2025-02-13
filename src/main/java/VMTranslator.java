@@ -38,6 +38,16 @@ public class VMTranslator {
                             case C_PUSH:
                                 writer.writePushPop(parser.currentCommand, parser.commandSource,
                                         parser.arg1, parser.arg2, parser.commandNumber);
+                                break;
+                            case C_LABEL:
+                                writer.writeLabel(parser.arg1, parser.commandSource);
+                                break;
+                            case C_GOTO:
+                                writer.writeGoto(parser.arg1, parser.commandSource);
+                                break;
+                            case C_IF:
+                                writer.writeIf(parser.arg1, parser.commandSource);
+                                break;
                         }
                     }
                 } finally {

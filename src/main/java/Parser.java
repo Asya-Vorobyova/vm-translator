@@ -5,7 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Parser {
-    public static final Pattern CMD_PATTERN = Pattern.compile("([^/]*)\\s*(//.*)?");
+    public static final Pattern CMD_PATTERN = Pattern.compile("([^/]*)(//.*)?");
 
     private final Scanner scanner;
     private String currentLine;
@@ -38,7 +38,7 @@ public class Parser {
 
         Matcher matcher = Parser.CMD_PATTERN.matcher(currentLine);
         if (matcher.find()) {
-            commandSource = matcher.group(1);
+            commandSource = matcher.group(1).strip();
             commandNumber++;
             String[] parts = commandSource.split(" ");
             if (ArithmeticOp.parse(parts[0]) != null) {
