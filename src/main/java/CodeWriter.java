@@ -7,7 +7,7 @@ import java.util.Objects;
 public class CodeWriter implements AutoCloseable {
     private final BufferedWriter writer;
     private String fileName;
-    private String functionName = "None";
+    private String functionName = "";
 
     public CodeWriter(Path outputPath) throws IOException {
         this.writer = new BufferedWriter(new FileWriter(outputPath.toFile()));
@@ -15,6 +15,7 @@ public class CodeWriter implements AutoCloseable {
 
     public void setFileName(String fileName) {
         this.fileName = fileName;
+        this.functionName = fileName + ".none";
     }
 
     public void writeNewFile() throws IOException {
@@ -50,19 +51,19 @@ public class CodeWriter implements AutoCloseable {
 
     public void writeLabel(String label, String commandSource) throws IOException {
         oneLine("// " + commandSource);
-        oneLine("(" + this.fileName + "." + functionName + "$" + label + ")");
+        oneLine("(" + functionName + "$" + label + ")");
     }
 
     public void writeGoto(String label, String commandSource) throws IOException {
         oneLine("// " + commandSource);
-        oneLine("@" + this.fileName + "." + functionName + "$" + label);
+        oneLine("@" + functionName + "$" + label);
         oneLine("0;JMP");
     }
 
     public void writeIf(String label, String commandSource) throws IOException {
         oneLine("// " + commandSource);
         assignDToStackValue();
-        oneLine("@" + this.fileName + "." + functionName + "$" + label);
+        oneLine("@" + functionName + "$" + label);
         oneLine("D;JNE");
     }
 
