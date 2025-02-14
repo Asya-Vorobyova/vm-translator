@@ -67,16 +67,59 @@ public class CodeWriter implements AutoCloseable {
         oneLine("D;JNE");
     }
 
-    public void writeCall(String functionName, int numArgs) throws IOException {
+    public void writeCall(String functionName, int numArgs, String commandSource) throws IOException {
         //TODO
     }
 
-    public void writeReturn() throws IOException {
-        //TODO
+    public void writeReturn(String commandSource) throws IOException {
+        oneLine("// " + commandSource);
+        oneLine("@LCL");
+        oneLine("D=M");
+        oneLine("@" + this.fileName + "." + functionName + ".endFrame");
+        oneLine("M=D"); // endFrame=LCL
+
+        oneLine("@" + 5);
+        oneLine("D=D-A"); // D=endFrame-5
+        oneLine("A=D");
+        oneLine("D=M"); // D=*(endFrame-5)
+        oneLine("@" + this.fileName + "." + functionName + ".retAddr");
+        oneLine("M=D"); // retAddr=*(endFrame-5)
+
+        assignDToStackValue(); // D=pop()
+        oneLine("@ARG");
+        oneLine("A=M");
+        oneLine("M=D"); // *ARG=pop()
+        oneLine("D=A");
+        oneLine("@SP");
+        oneLine("M=D+1"); // SP=ARG+1
+
+        restoreMemorySegment(MemorySegment.THAT); // THAT=*(endFrame-1)
+        restoreMemorySegment(MemorySegment.THIS); // THIS=*(endFrame-2)
+        restoreMemorySegment(MemorySegment.ARG); // ARG=*(endFrame-3)
+        restoreMemorySegment(MemorySegment.LCL); // LCL=*(endFrame-4)
+
+        oneLine("@" + this.fileName + "." + functionName + ".retAddr");
+        oneLine("A=M");
+        oneLine("0;JMP"); // goto retAddr
     }
 
-    public void writeFunction(String functionName, int numLocals) throws IOException {
-        //TODO
+    private void restoreMemorySegment(MemorySegment segment) throws IOException {
+        oneLine("@" + this.fileName + "." + functionName + ".endFrame");
+        oneLine("M=M-1"); // endFrame--
+        oneLine("D=M"); // D=endFrame
+        oneLine("A=D");
+        oneLine("D=M"); // D=*endFrame
+        oneLine("@" + segment.name());
+        oneLine("M=D"); // SEG=*endFrame
+    }
+
+    public void writeFunction(String functionName, int numLocals, String commandSource) throws IOException {
+        this.functionName = functionName;
+        oneLine("// " + commandSource);
+        oneLine("(" + functionName + ")");
+        for (int i = 0; i < numLocals; i++) {
+            applyPush(MemorySegment.CONST.getValue(), 0);
+        }
     }
 
     public void close() throws IOException {

@@ -48,6 +48,12 @@ public class VMTranslator {
                             case C_IF:
                                 writer.writeIf(parser.arg1, parser.commandSource);
                                 break;
+                            case C_FUNCTION:
+                                writer.writeFunction(parser.arg1, parser.arg2, parser.commandSource);
+                                break;
+                            case C_RETURN:
+                                writer.writeReturn(parser.commandSource);
+                                break;
                         }
                     }
                 } finally {
